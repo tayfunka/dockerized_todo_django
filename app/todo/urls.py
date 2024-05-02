@@ -12,7 +12,7 @@ from todo import views
 
 
 router = DefaultRouter()
-router.register('todos', views.TodoViewSet)
+router.register('', views.TodoViewSet)
 
 app_name = 'todo'
 
