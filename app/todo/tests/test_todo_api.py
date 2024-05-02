@@ -92,7 +92,7 @@ class PrivateTodoApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_get_todo_detail(self):
-        """Test get todo detail."""
+        """Test get todo detail.."""
         todo = create_todo(user=self.user)
 
         url = detail_url(todo.id)
