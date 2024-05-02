@@ -39,6 +39,11 @@ def create_todo(user, **params):
     return todo
 
 
+def create_user(**params):
+    """Create and return a new user."""
+    return get_user_model().objects.create_user(**params)
+
+
 class PublicTodoAPITests(TestCase):
     """Test unauthenticated API requests."""
 
@@ -57,10 +62,7 @@ class PrivateTodoApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            'test@example.com',
-            'testpass123',
-        )
+        self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
 
     def test_retrieve_todos(self):
@@ -77,10 +79,7 @@ class PrivateTodoApiTests(TestCase):
 
     def test_todo_list_limited_to_user(self):
         """Test list of todos is limited to authenticated user."""
-        other_user = get_user_model().objects.create_user(
-            'other@example.com',
-            'password123',
-        )
+        other_user = create_user(email='other@example.com', password='test123')
         create_todo(user=other_user)
         create_todo(user=self.user)
 
@@ -100,6 +99,82 @@ class PrivateTodoApiTests(TestCase):
 
         serializer = TodoDetailSerializer(todo)
         self.assertEqual(res.data, serializer.data)
+
+    def test_mark_todo_as_completed(self):
+        """Test status update of a todo."""
+        todo = create_todo(
+            user=self.user,
+            content='test todo.',
+            due_date=timezone.now() + datetime.timedelta(days=1),
+            status=True,
+            priority=False,
+        )
+
+        payload = {'status': False}
+        url = detail_url(todo.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        todo.refresh_from_db()
+        self.assertEqual(todo.status, payload['status'])
+
+    def test_full_update(self):
+        """Test full update of todo."""
+        todo = create_todo(
+            user=self.user,
+            content='test todo.',
+            due_date=timezone.now() + datetime.timedelta(days=1),
+            status=True,
+            priority=False,
+        )
+
+        payload = {
+            'content': 'New test todo.',
+            'due_date': timezone.now() + datetime.timedelta(days=1),
+            'status': False,
+            'priority': True,
+        }
+        url = detail_url(todo.id)
+        res = self.client.put(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        todo.refresh_from_db()
+        for k, v in payload.items():
+            self.assertEqual(getattr(todo, k), v)
+        self.assertEqual(todo.user, self.user)
+
+    def test_update_user_returns_error(self):
+        """Test changing the todo user results in an error."""
+        new_user = create_user(email='test2@example.com', password='test123')
+        todo = create_todo(user=self.user)
+
+        payload = {'user': new_user.id}
+        url = detail_url(todo.id)
+        self.client.patch(url, payload)
+
+        todo.refresh_from_db()
+        self.assertEqual(todo.user, self.user)
+
+    def test_delete_todo(self):
+        """Test deleting a todo successful."""
+        todo = create_todo(user=self.user)
+
+        url = detail_url(todo.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Todo.objects.filter(id=todo.id).exists())
+
+    def test_todo_other_users_todo_error(self):
+        """Test trying to delete another users todo gives error."""
+        new_user = create_user(email='user2@example.com', password='test123')
+        todo = create_todo(user=new_user)
+
+        url = detail_url(todo.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Todo.objects.filter(id=todo.id).exists())
 
     def test_create_todo(self):
         """Test creating a todo."""

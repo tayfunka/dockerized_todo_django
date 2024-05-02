@@ -57,16 +57,5 @@ class Todo(models.Model):
     priority = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def mark_as_completed(self):
-        self.status = False
-        self.save()
-
-    def mark_as_high_priority(self):
-        self.priority = True
-        self.save()
-
-    def was_created_recently(self):
-        return self.created_at >= timezone.now() - datetime.timedelta(days=1)
-
     def __str__(self):
         return self.content
