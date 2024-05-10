@@ -21,7 +21,9 @@ from drf_spectacular.views import (
 
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken import views
 
+from core.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),
@@ -32,4 +34,9 @@ urlpatterns = [
     ),
     path('api/user/', include('user.urls')),
     path('api/todos/', include('todo.urls')),
+    path('', home, name='home')
+]
+
+urlpatterns += [
+    path('api/', include('rest_framework.urls'))
 ]

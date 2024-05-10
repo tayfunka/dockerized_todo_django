@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ListApp</title>
+    <style>
+        .htmx-swapping {
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+
+        #main-content {
+            display: none;
+        }
+
+        #loading-message {
+            display: block;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="flex items-center justify-between px-4 py-6 text-center">
+        <a href="/" class="text-2xl text-black">ListApp</a>
+        {% if request.user.is_authenticated %}
+        <a href="/api/logout" class="text-2xl text-black">Logout</a>
+        {% endif %}
+    </nav>
+    <div id="loading-message">Loading...</div>
+
+    <div class="w-1/2 my-6 mx-auto p-2 lg:p-5 bg-white rounded-xl" id="main-content">
+        <form class="flex mb-6 space-x-4" hx-post="/api/todos/" hx-target="#todos" hx-swap="afterend">
+            <input type="text" name="content"
+                class="content flex-1 px-4 py-3 bg-gray-200 rounded-xl focus:outline-slate-500"
+                placeholder="What needs to be done?" autofocus />
+            <button class="p-3 rounded-xl duration-300 text-white bg-slate-500 hover:bg-slate-600">Add Task</button>
+        </form>
+
+        <div class="peer divide-y rounded-xl divide-slate-200" id="todos">
+            {% for todo in todos %}
+            {% include 'partials/todo.html' %}
+            {% endfor %}
+        </div>
+
+        <div class="flex px-6 py-3 rounded-xl bg-slate-100">
+            <ul class="filters ml-auto flex">
+                <li>
+                    <button
+                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        onclick="showAllTodos()">All</button>
+                </li>
+                <li>
+                    <button
+                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        onclick="showActiveTodos()" id="active_todo">Active {{todo_count}} </button>
+                </li>
+                <li>
+                    <button
+                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        onclick="showCompletedTodos()">Completed</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+
+
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+        document.querySelector("input.content").value = '';
+        updateItemCount();
+    });
+
+    function updateItemCount() {
+        var totalItems = document.querySelectorAll('#todo-article').length;
+        var completedItems = document.querySelectorAll('#todo-article input[type="checkbox"]:checked').length;
+        var itemsLeft = totalItems - completedItems;
+        document.getElementById('active_todo').innerText = ' Active ' + itemsLeft;
+    }
+
+    function showAllTodos() {
+        console.log()
+        document.querySelectorAll('#todo-article').forEach(function (todo) {
+            todo.style.display = 'flex';
+        });
+    }
+    function showActiveTodos() {
+        document.querySelectorAll('#todo-article').forEach(function (todo) {
+            if (todo.querySelector('input[type="checkbox"]').checked) {
+                todo.style.display = 'none';
+            } else {
+                todo.style.display = 'flex';
+            }
+        });
+    }
+    function showCompletedTodos() {
+        document.querySelectorAll('#todo-article').forEach(function (todo) {
+            if (todo.querySelector('input[type="checkbox"]').checked) {
+                todo.style.display = 'flex';
+            } else {
+                todo.style.display = 'none';
+            }
+        });
+    }
+    window.addEventListener('load', function () {
+        document.getElementById('loading-message').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        updateItemCount();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteButtons = document.querySelectorAll('[hx-delete]');
+        deleteButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var todoArticle = button.closest('#todo-article');
+                if (todoArticle) {
+                    todoArticle.remove();
+                    updateItemCount();
+                }
+            });
+        });
+    });
+
+
+
+</script>
+
+</html>
