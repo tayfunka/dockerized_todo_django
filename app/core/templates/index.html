@@ -1,43 +1,12 @@
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ListApp</title>
-    <style>
-        .htmx-swapping {
-            opacity: 0;
-            transition: opacity 1s ease-out;
-        }
+{% extends "base.html" %}
+{% block content%}
+    <div id="loading-message" class="text-white bg-gray-700">Loading...</div>
 
-        #main-content {
-            display: none;
-        }
-
-        #loading-message {
-            display: block;
-            text-align: center;
-            margin-top: 50px;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="flex items-center justify-between px-4 py-6 text-center">
-        <a href="/" class="text-2xl text-black">ListApp</a>
-        {% if request.user.is_authenticated %}
-        <a href="/api/logout" class="text-2xl text-black">Logout</a>
-        {% endif %}
-    </nav>
-    <div id="loading-message">Loading...</div>
-
-    <div class="w-1/2 my-6 mx-auto p-2 lg:p-5 bg-white rounded-xl" id="main-content">
+    <div class="w-1/2 my-6 mx-auto p-2 lg:p-5 rounded-xl dark:bg-gray-800" id="main-content">
         <form class="flex mb-6 space-x-4" hx-post="/api/todos/" hx-target="#todos" hx-swap="afterend">
-            <input type="text" name="content"
-                class="content flex-1 px-4 py-3 bg-gray-200 rounded-xl focus:outline-slate-500"
-                placeholder="What needs to be done?" autofocus />
-            <button class="p-3 rounded-xl duration-300 text-white bg-slate-500 hover:bg-slate-600">Add Task</button>
+            <input type="text" name="content" class="content bg-gray-50 border border-gray-300 text-gray-900 sm:text-l rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="What needs to be done?" autofocus />
+            <button class="p-3 rounded-xl duration-300 text-white bg-gray-700 hover:bg-slate-600">Add Task</button>
         </form>
 
         <div class="peer divide-y rounded-xl divide-slate-200" id="todos">
@@ -46,29 +15,26 @@
             {% endfor %}
         </div>
 
-        <div class="flex px-6 py-3 rounded-xl bg-slate-100">
+        <div class="flex px-6 py-3 rounded-xl dark:bg-gray-700">
             <ul class="filters ml-auto flex">
                 <li>
                     <button
-                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        class="text-white hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
                         onclick="showAllTodos()">All</button>
                 </li>
                 <li>
                     <button
-                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        class="text-white hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
                         onclick="showActiveTodos()" id="active_todo">Active {{todo_count}} </button>
                 </li>
                 <li>
                     <button
-                        class="text-gray-500 hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
+                        class="text-white hover:border-slate-500 border border-transparent rounded-md px-3 py-1 text-xs font-medium"
                         onclick="showCompletedTodos()">Completed</button>
                 </li>
             </ul>
         </div>
     </div>
-</body>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/htmx.org@1.6.1"></script>
 
 
 <script>
@@ -122,6 +88,7 @@
         deleteButtons.forEach(function (button) {
             button.addEventListener('click', function () {
                 var todoArticle = button.closest('#todo-article');
+                console.log(todoArticle)
                 if (todoArticle) {
                     todoArticle.remove();
                     updateItemCount();
@@ -133,5 +100,4 @@
 
 
 </script>
-
-</html>
+{% endblock%}

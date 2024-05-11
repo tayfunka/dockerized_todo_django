@@ -2,7 +2,7 @@
 Views for the todo APIs
 """
 from rest_framework import viewsets
-from rest_framework.authentication import TokenAuthentication  # noqa
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication  # noqa
 from rest_framework.permissions import IsAuthenticated  # noqa
 from django.http.response import HttpResponse
 
@@ -16,16 +16,17 @@ class TodoViewSet(viewsets.ModelViewSet):
     """View for manage todo APIs."""
     serializer_class = serializers.TodoDetailSerializer
     queryset = Todo.objects.all()
-    """Decomment if you want to try TokenAuthentication
-    authentication_classes = [TokenAuthentication]
+    # Uncomment for TokenAuthentication
+    # authentication_classes = [TokenAuthentication]
+    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    """
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'partials/todo.html'
 
     def get_queryset(self):
         """Retrieve todos for authenticated user."""
-        return self.queryset.filter(user=self.request.user).order_by('created_at')
+        return self.queryset.filter(
+            user=self.request.user).order_by('created_at')
 
     def get_serializer_class(self):
         """Return the serializer class for request."""

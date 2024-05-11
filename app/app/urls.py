@@ -21,8 +21,8 @@ from drf_spectacular.views import (
 
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.authtoken import views
-
+from django.contrib.auth import views
+from user.views import CreateUserView
 from core.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,5 +38,9 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('api/', include('rest_framework.urls'))
+    path('login/', views.LoginView.as_view(
+        template_name='partials/login.html'),
+        name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('register/', CreateUserView.as_view(), name='register'),
 ]

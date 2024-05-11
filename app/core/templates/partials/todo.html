@@ -1,8 +1,8 @@
-<article class="flex {% if todo.status %} bg-slate-100{% endif %} group/item hover:bg-slate-200" id="todo-article">
+<article class="flex {% if todo.status %} bg-gray-700{% endif %} group/item hover:bg-gray-500" id="todo-article">
     <label class="relative flex items-center p-3 rounded-full cursor-pointer" htmlFor="customStyle">
 
         <input type="checkbox"
-            class="before:content[''] peer relative h-8 w-8 cursor-pointer appearance-none rounded-full border border-gray-900/20 bg-gray-900/10 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-600 checked:bg-slate-400 checked:before:bg-green-600 hover:scale-105 hover:before:opacity-0"
+            class="before:content[''] peer relative h-8 w-8 cursor-pointer appearance-none rounded-full border border-gray-200/20 bg-gray-600/10 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-600 checked:bg-slate-400 checked:before:bg-green-600 hover:scale-105 hover:before:opacity-0"
             id="customStyle" hx-patch="/api/todos/{{ todo.id }}/" hx-target="closest article" hx-swap="outerHTML"
             type="checkbox" name="todo[1]" {% if todo.status %}checked{% endif %} />
         <span
@@ -16,7 +16,7 @@
         </span>
     </label>
     <div class="w-3/5 py-3">
-        <p class="px-6 py-3 text-gray-900" id="{{ todo.id }}">
+        <p class="px-6 py-3 text-gray-100" id="{{ todo.id }}">
             {{ todo.content }}
         </p>
     </div>

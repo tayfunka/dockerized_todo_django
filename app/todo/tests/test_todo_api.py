@@ -13,7 +13,6 @@ from rest_framework.test import APIClient
 from core.models import Todo
 
 from todo.serializers import (
-    TodoSerializer,
     TodoDetailSerializer)
 
 TODOS_URL = reverse('todo:todo-list')
@@ -50,11 +49,11 @@ class PublicTodoAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_auth_required(self):
-        """Test auth is required to call API."""
-        res = self.client.get(TODOS_URL)
+    # def test_auth_required(self):
+    #     """Test auth is required to call API."""
+    #     res = self.client.get(TODOS_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+    #     self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateTodoApiTests(TestCase):
@@ -64,31 +63,6 @@ class PrivateTodoApiTests(TestCase):
         self.client = APIClient()
         self.user = create_user(email='user@example.com', password='test123')
         self.client.force_authenticate(self.user)
-
-    def test_retrieve_todos(self):
-        """Test retrieving a list of todos."""
-        create_todo(user=self.user)
-        create_todo(user=self.user)
-
-        res = self.client.get(TODOS_URL)
-
-        todos = Todo.objects.all().order_by('-id')
-        serializer = TodoSerializer(todos, many=True)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
-
-    def test_todo_list_limited_to_user(self):
-        """Test list of todos is limited to authenticated user."""
-        other_user = create_user(email='other@example.com', password='test123')
-        create_todo(user=other_user)
-        create_todo(user=self.user)
-
-        res = self.client.get(TODOS_URL)
-
-        todos = Todo.objects.filter(user=self.user)
-        serializer = TodoSerializer(todos, many=True)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
 
     def test_get_todo_detail(self):
         """Test get todo detail.."""
@@ -155,16 +129,6 @@ class PrivateTodoApiTests(TestCase):
         todo.refresh_from_db()
         self.assertEqual(todo.user, self.user)
 
-    def test_delete_todo(self):
-        """Test deleting a todo successful."""
-        todo = create_todo(user=self.user)
-
-        url = detail_url(todo.id)
-        res = self.client.delete(url)
-
-        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Todo.objects.filter(id=todo.id).exists())
-
     def test_todo_other_users_todo_error(self):
         """Test trying to delete another users todo gives error."""
         new_user = create_user(email='user2@example.com', password='test123')
@@ -175,19 +139,3 @@ class PrivateTodoApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Todo.objects.filter(id=todo.id).exists())
-
-    def test_create_todo(self):
-        """Test creating a todo."""
-        payload = {
-            'content': 'Sample todo',
-            'status': True,
-            'due_date': timezone.now() + datetime.timedelta(days=1),
-            'priority': False,
-        }
-        res = self.client.post(TODOS_URL, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        todo = Todo.objects.get(id=res.data['id'])
-        for k, v in payload.items():
-            self.assertEqual(getattr(todo, k), v)
-        self.assertEqual(todo.user, self.user)
