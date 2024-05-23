@@ -3,7 +3,10 @@
 
         <input type="checkbox"
             class="before:content[''] peer relative h-8 w-8 cursor-pointer appearance-none rounded-full border border-gray-200/20 bg-gray-600/10 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-600 checked:bg-slate-400 checked:before:bg-green-600 hover:scale-105 hover:before:opacity-0"
-            id="customStyle" hx-patch="/api/todos/{{ todo.id }}/" hx-target="closest article" hx-swap="outerHTML"
+            id="customStyle"
+            hx-put="update_todo/{{ todo.id }}/"
+            hx-target="closest article"
+            hx-swap="outerHTML"
             type="checkbox" name="todo[1]" {% if todo.status %}checked{% endif %} />
         <span
             class="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
@@ -32,7 +35,7 @@
         {% endif %}
         <button
             class="w-1/2 px-6 py-3 text-xs text-center hover:text-slate-900 group/edit invisible group-hover/item:visible"
-            hx-target="closest article" hx-swap="outerHTML swap:1s" hx-delete="/api/todos/{{ todo.id }}/">
+            hx-target="closest article" hx-swap="outerHTML" hx-delete="delete_todo/{{ todo.id }}">
             <span class="group-hover/edit:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-6 h-6">

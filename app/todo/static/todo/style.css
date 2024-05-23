@@ -1,0 +1,14 @@
+.htmx-swapping {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+#main-content {
+    display: none;
+}
+
+#loading-message {
+    display: block;
+    text-align: center;
+    margin-top: 50px;
+}

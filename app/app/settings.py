@@ -140,5 +140,5 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login'
+LOGIN_REDIRECT_URL = '/todos'
+LOGOUT_REDIRECT_URL = '/user/login'

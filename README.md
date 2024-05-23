@@ -6,7 +6,7 @@ The ListApp project is a Django-based to-do list application developed to meet u
 
 ### Technologies Used
 
-- Django
+- Djangof
 - Django Rest Framework
 - PostgreSQL
 - HTMX
